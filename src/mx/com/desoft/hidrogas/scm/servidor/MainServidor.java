@@ -55,13 +55,15 @@ public class MainServidor {
 	}
 
 	public static void LeerDirectorio() {
-		File directorio = new File("");
+		File directorio = new File("/Users/deiveloper/documents/pruebas");
 		if (directorio.exists()) {
 			File[] archivos = directorio.listFiles();
 			pedidosMensajes = new ArrayList<>();
 			for (int i = 0; i < archivos.length; i++) {
 				LeerArchivos(archivos[i]);
-				pedidosMensajes.add(new Data(numeroCelular, mensaje));
+				if(!numeroCelular.equals("") && !mensaje.equals("")) {
+					pedidosMensajes.add(new Data(numeroCelular, mensaje));
+				}
 			}
 		} else {
 			System.out.println("Error al leer el archivo");
