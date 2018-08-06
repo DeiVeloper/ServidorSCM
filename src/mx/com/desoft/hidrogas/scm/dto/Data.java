@@ -9,11 +9,13 @@ public class Data implements Serializable{
 	 */
 	private static final long serialVersionUID = 2958726625432040690L;
 	private String numeroCelular;
-	private String mensaje; 
+	private String mensaje;
+	private String nombreArchivo;
 
-	public Data(String numeroCelular, String mensaje ) {
+	public Data(String numeroCelular, String mensaje, String nombreArchivo) {
 		this.setNumeroCelular(numeroCelular);
 		this.setMensaje(mensaje);
+		this.setNombreArchivo(nombreArchivo);
 	}
    	   
 	public String getNumeroCelular() {
@@ -32,6 +34,14 @@ public class Data implements Serializable{
 		this.mensaje = mensaje;
 	}
 	
+	public String getNombreArchivo() {
+		return nombreArchivo;
+	}
+
+	public void setNombreArchivo(String nombreArchivo) {
+		this.nombreArchivo = nombreArchivo;
+	}
+
 	@Override
 	public String toString() {
 		return "Data [numeroCelular=" + getNumeroCelular() + ", mensaje=" + getMensaje()+ "]";
