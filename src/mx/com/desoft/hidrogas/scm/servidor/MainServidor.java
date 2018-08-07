@@ -23,9 +23,9 @@ public class MainServidor {
 	private static ArrayList<Data> pedidosMensajes;
 	private static String numeroCelular = "";
 	private static String mensaje = "";
-	private static String nombreArchivo = ""; 
-	
-	
+	private static String nombreArchivo = "";
+
+
 	private Socket socket;
     private ServerSocket serverSocket;
     private DataInputStream bufferDeEntrada = null;
@@ -66,7 +66,7 @@ public class MainServidor {
 		MainServidor server = new MainServidor();
 		server.ejecutarConexion(PORT);
 	}
-	
+
 	public void ejecutarConexion(int puerto) {
         Thread hilo = new Thread(new Runnable() {
             @Override
@@ -84,7 +84,7 @@ public class MainServidor {
         });
         hilo.start();
     }
-	
+
 	public void levantarConexion(int puerto) {
         try {
             serverSocket = new ServerSocket(puerto);
@@ -96,26 +96,30 @@ public class MainServidor {
             System.exit(0);
         }
     }
-	
+
 	public void flujos() {
         try {
         	bufferDeEntrada = new DataInputStream(socket.getInputStream());
+
             bufferDeSalida = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
         	System.out.println("Error en la apertura de flujos");
         }
     }
-	
+
 	public void recibirDatos() {
         String nombreArchivo = "";
         try {
             do {
             	nombreArchivo = (String) bufferDeEntrada.readUTF();
                 if(nombreArchivo.equals(COMANDO_INCIAR)) {
+                	System.out.println("entra");
+                	System.out.println(nombreArchivo);
                 	LeerDirectorio();
                 	bufferDeSalida.flush();
                 	bufferDeSalida.writeObject(pedidosMensajes);
                 } else {
+                	System.out.println(nombreArchivo);
                 	EliminarArchivo(nombreArchivo);
                 }
             } while (!nombreArchivo.equals(COMANDO_TERMINACION));
@@ -123,7 +127,7 @@ public class MainServidor {
             cerrarConexion();
         }
     }
-	
+
 	public void cerrarConexion() {
         try {
             bufferDeEntrada.close();
@@ -139,7 +143,7 @@ public class MainServidor {
     }
 
 	public static void LeerDirectorio() {
-		File directorio = new File("/Users/deiveloper/documents/pruebas");
+		File directorio = new File("/Users/ErickMV/Documents/pruebas");
 		if (directorio.exists()) {
 			File[] archivos = directorio.listFiles();
 			pedidosMensajes = new ArrayList<>();
@@ -171,7 +175,7 @@ public class MainServidor {
 					} else {
 						mensaje = linea;
 						numeroCelular = "1";
-					}	
+					}
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -180,10 +184,14 @@ public class MainServidor {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void EliminarArchivo(String nombre) {
-		File archivo = new File("/Users/deiveloper/documents/pruebas" + nombre);
+		File archivo = new File("/Users/ErickMV/Documents/pruebas/"+nombre);
+		System.out.println("/Users/ErickMV/Documents/pruebas/"+nombre);
+		System.out.println("path: " + archivo.getPath());
+		System.out.println("pathAbso: " + archivo.getAbsolutePath());
 		if(archivo.exists()) {
+			System.out.println("existe" );
 			archivo.delete();
 		}
 	}
