@@ -32,6 +32,7 @@ public class MainServidor {
     private ObjectOutputStream bufferDeSalida = null;
     final String COMANDO_TERMINACION = "--T";
     final String COMANDO_INCIAR = "--I";
+    private ArrayList<String> archivosEliminar;
 
 	/**
 	 * @param args
@@ -73,11 +74,13 @@ public class MainServidor {
             public void run() {
                 while (true) {
                     try {
+                    	archivosEliminar = new ArrayList<String>();
                         levantarConexion(puerto);
                         flujos();
                         recibirDatos();
                     } finally {
                         cerrarConexion();
+                        EliminarArchivo(archivosEliminar);
                     }
                 }
             }
@@ -100,7 +103,6 @@ public class MainServidor {
 	public void flujos() {
         try {
         	bufferDeEntrada = new DataInputStream(socket.getInputStream());
-
             bufferDeSalida = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
         	System.out.println("Error en la apertura de flujos");
@@ -120,7 +122,8 @@ public class MainServidor {
                 	bufferDeSalida.writeObject(pedidosMensajes);
                 } else {
                 	System.out.println(nombreArchivo);
-                	EliminarArchivo(nombreArchivo);
+                	archivosEliminar.add(nombreArchivo);
+//                	EliminarArchivo(nombreArchivo);
                 }
             } while (!nombreArchivo.equals(COMANDO_TERMINACION));
         } catch (IOException e) {
@@ -137,7 +140,7 @@ public class MainServidor {
         	System.out.println("Excepción en cerrarConexion(): " + e.getMessage());
         } finally {
         	System.out.println("Conversación finalizada....");
-            System.exit(0);
+//            System.exit(0);
 
         }
     }
@@ -185,14 +188,16 @@ public class MainServidor {
 		}
 	}
 
-	private void EliminarArchivo(String nombre) {
-		File archivo = new File("/Users/ErickMV/Documents/pruebas/"+nombre);
-		System.out.println("/Users/ErickMV/Documents/pruebas/"+nombre);
-		System.out.println("path: " + archivo.getPath());
-		System.out.println("pathAbso: " + archivo.getAbsolutePath());
-		if(archivo.exists()) {
-			System.out.println("existe" );
-			archivo.delete();
+	private void EliminarArchivo(ArrayList<String> archivosEliminar) {
+		File archivo;
+		for(String nombreArchivo : archivosEliminar) {
+			archivo = new File("/Users/ErickMV/Documents/pruebas/"+nombreArchivo);
+			System.out.println("pathAbso: " + archivo.getAbsolutePath());
+			if(archivo.exists()) {
+				System.out.println("existe" );
+				System.out.println("archivo eliminado: " + nombreArchivo);
+				archivo.delete();
+			}
 		}
 	}
 
