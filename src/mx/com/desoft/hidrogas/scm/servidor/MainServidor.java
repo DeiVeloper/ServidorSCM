@@ -26,13 +26,14 @@ public class MainServidor {
 	private static String nombreArchivo = "";
 
 
-	private Socket socket;
-    private ServerSocket serverSocket;
-    private DataInputStream bufferDeEntrada = null;
-    private ObjectOutputStream bufferDeSalida = null;
-    final String COMANDO_TERMINACION = "--T";
-    final String COMANDO_INCIAR = "--I";
-    private ArrayList<String> archivosEliminar;
+//	private static Socket socket;
+//    private static ServerSocket serverSocket;
+    private static DataInputStream bufferDeEntrada = null;
+    private static ObjectOutputStream bufferDeSalida = null;
+    final static String COMANDO_TERMINACION = "--T";
+    final static String COMANDO_INCIAR = "--I";
+    private static ArrayList<String> archivosEliminar;
+    private static Socket clientSocket;
 
 	/**
 	 * @param args
@@ -40,22 +41,26 @@ public class MainServidor {
 	 */
 	@SuppressWarnings({ "resource" })
 	public static void main(String[] args) {
-		/*try {
+		try {
 			ServerSocket serverSocket = new ServerSocket(PORT);
 			System.out.println("Servidor> Servidor iniciado");
 			System.out.println("Servidor> En espera de cliente...");
-			Socket clientSocket;
+//			Socket clientSocket;
 			while (true) {
 				clientSocket = serverSocket.accept();
 				System.out.println("Servidor> ConexiÃ³n exitosa");
-				BufferedReader input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+				/*BufferedReader input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 				ObjectOutputStream output = new ObjectOutputStream(clientSocket.getOutputStream());
 				String request = input.readLine();
                 System.out.println("Cliente> peticiÃ³n [" + request +  "]");
 				LeerDirectorio();
 				output.flush();
-				output.writeObject(pedidosMensajes);
+				output.writeObject(pedidosMensajes);*/
+				archivosEliminar = new ArrayList<String>();
+				flujos();
+				recibirDatos();
 				clientSocket.close();
+				EliminarArchivo(archivosEliminar);
 				for (Data list : pedidosMensajes) {
 					System.out.println(list.getNumeroCelular().concat(" - " ).concat(list.getMensaje()));
 				}
@@ -63,53 +68,21 @@ public class MainServidor {
 		} catch (IOException ex) {
 			System.err.println(ex.getMessage());
 			ex.printStackTrace();
-		}*/
-		MainServidor server = new MainServidor();
-		server.ejecutarConexion(PORT);
+		}
+//		MainServidor server = new MainServidor();
+//		server.ejecutarConexion(PORT);
 	}
 
-	public void ejecutarConexion(int puerto) {
-        Thread hilo = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                    	archivosEliminar = new ArrayList<String>();
-                        levantarConexion(puerto);
-                        flujos();
-                        recibirDatos();
-                    } finally {
-                        cerrarConexion();
-                        EliminarArchivo(archivosEliminar);
-                    }
-                }
-            }
-        });
-        hilo.start();
-    }
-
-	public void levantarConexion(int puerto) {
+	public static void flujos() {
         try {
-            serverSocket = new ServerSocket(puerto);
-            System.out.println("Esperando conexión entrante en el puerto " + String.valueOf(puerto) + "...");
-            socket = serverSocket.accept();
-            System.out.println("Conexión establecida con: " + socket.getInetAddress().getHostName() + "\n\n\n");
-        } catch (Exception e) {
-        	System.out.println("Error en levantarConexion(): " + e.getMessage());
-            System.exit(0);
-        }
-    }
-
-	public void flujos() {
-        try {
-        	bufferDeEntrada = new DataInputStream(socket.getInputStream());
-            bufferDeSalida = new ObjectOutputStream(socket.getOutputStream());
+        	bufferDeEntrada = new DataInputStream(clientSocket.getInputStream());
+            bufferDeSalida = new ObjectOutputStream(clientSocket.getOutputStream());
         } catch (IOException e) {
         	System.out.println("Error en la apertura de flujos");
         }
     }
 
-	public void recibirDatos() {
+	public static void recibirDatos() {
         String nombreArchivo = "";
         try {
             do {
@@ -127,21 +100,8 @@ public class MainServidor {
                 }
             } while (!nombreArchivo.equals(COMANDO_TERMINACION));
         } catch (IOException e) {
-            cerrarConexion();
-        }
-    }
-
-	public void cerrarConexion() {
-        try {
-            bufferDeEntrada.close();
-            bufferDeSalida.close();
-            socket.close();
-        } catch (IOException e) {
-        	System.out.println("Excepción en cerrarConexion(): " + e.getMessage());
-        } finally {
-        	System.out.println("Conversación finalizada....");
-//            System.exit(0);
-
+//            cerrarConexion();
+        	System.out.println("Error en recibir datos");
         }
     }
 
@@ -156,6 +116,7 @@ public class MainServidor {
 					pedidosMensajes.add(new Data(numeroCelular, mensaje, nombreArchivo));
 				}
 			}
+			archivos = null;
 		} else {
 			System.out.println("Error al leer el archivo");
 		}
@@ -181,6 +142,7 @@ public class MainServidor {
 					}
 				}
 			}
+			archivoSMS = null;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -188,7 +150,7 @@ public class MainServidor {
 		}
 	}
 
-	private void EliminarArchivo(ArrayList<String> archivosEliminar) {
+	private static void EliminarArchivo(ArrayList<String> archivosEliminar) {
 		File archivo;
 		for(String nombreArchivo : archivosEliminar) {
 			archivo = new File("/Users/ErickMV/Documents/pruebas/"+nombreArchivo);
