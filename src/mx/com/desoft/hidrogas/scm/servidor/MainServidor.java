@@ -59,7 +59,7 @@ public class MainServidor {
 
 	/**
 	 * Metodo usado para abrir los buffers de comunicacion
-	 * 
+	 *
 	 */
 	public static void flujos() {
         try {
@@ -72,35 +72,35 @@ public class MainServidor {
 
 	/**
 	 * Metodo usado para recibir y enviar datos
-	 * 
+	 *
 	 */
 	public static void recibirDatos() {
         String nombreArchivo = "";
         try {
-            do {
+            while(true) {
             	nombreArchivo = (String) bufferDeEntrada.readUTF();
                 if(nombreArchivo.equals(COMANDO_INCIAR)) {
-                	System.out.println(nombreArchivo);
                 	LeerDirectorio();
                 	bufferDeSalida.flush();
                 	bufferDeSalida.writeObject(pedidosMensajes);
+                } else if (nombreArchivo.equals(COMANDO_TERMINACION)) {
+                	break;
                 } else {
-                	System.out.println(nombreArchivo);
                 	EliminarArchivo(nombreArchivo);
                 }
-            } while (!nombreArchivo.equals(COMANDO_TERMINACION));
+            }
         } catch (IOException e) {
         	System.out.println("Error en recibir datos");
         }
     }
 
 	/**
-	 * Metodo usado para acceder al directorio 
+	 * Metodo usado para acceder al directorio
 	 * donde se encuentran los achivos
-	 * 
+	 *
 	 */
 	public static void LeerDirectorio() {
-		File directorio = new File("/Users/erick.martinezv/Documents/pruebas");
+		File directorio = new File("/Users/ErickMV/Documents/pruebas");
 		if (directorio.exists()) {
 			File[] archivos = directorio.listFiles();
 			pedidosMensajes = new ArrayList<>();
@@ -120,7 +120,7 @@ public class MainServidor {
 
 	/**
 	 * Metodo usado para leer los archivos
-	 * 
+	 *
 	 * @param archivoSMS
 	 */
 	private static void LeerArchivos(File archivoSMS) {
@@ -151,11 +151,11 @@ public class MainServidor {
 
 	/**
 	 * Metodo usado para eliminar los archivos
-	 * 
+	 *
 	 * @param nombreArchivo
 	 */
 	private static void EliminarArchivo(String nombreArchivo) {
-		File archivo = new File("/Users/erick.martinezv/Documents/pruebas/"+nombreArchivo);
+		File archivo = new File("/Users/ErickMV/Documents/pruebas/"+nombreArchivo);
 		System.out.println("pathAbso: " + archivo.getAbsolutePath());
 		if(archivo.exists()) {
 			System.out.println("existe" );
@@ -166,7 +166,7 @@ public class MainServidor {
 
 	/**
 	 * Metodo usado para obtener la extensión de los archivos
-	 * 
+	 *
 	 * @param nombreArchivo
 	 */
 	private static String getExtension(String fileName) {
