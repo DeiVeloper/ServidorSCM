@@ -27,8 +27,8 @@ public class MainServidor {
 
     private static DataInputStream bufferDeEntrada = null;
     private static ObjectOutputStream bufferDeSalida = null;
-    final static String COMANDO_TERMINACION = "--T";
-    final static String COMANDO_INCIAR = "--I";
+    final static String COMANDO_TERMINACION = "FIN";
+    final static String COMANDO_INCIAR = "INICIO";
     private static Socket clientSocket;
 
 	/**
@@ -75,22 +75,22 @@ public class MainServidor {
 	 *
 	 */
 	public static void recibirDatos() {
-        String nombreArchivo = "";
+        String nombreArchivo_ = "";
         try {
-            while(true) {
-            	nombreArchivo = (String) bufferDeEntrada.readUTF();
-                if(nombreArchivo.equals(COMANDO_INCIAR)) {
+            do {
+            	nombreArchivo_ = (String) bufferDeEntrada.readUTF();
+                if(nombreArchivo_.equals(COMANDO_INCIAR)) {
                 	LeerDirectorio();
                 	bufferDeSalida.flush();
                 	bufferDeSalida.writeObject(pedidosMensajes);
-                } else if (nombreArchivo.equals(COMANDO_TERMINACION)) {
-                	break;
-                } else {
-                	EliminarArchivo(nombreArchivo);
                 }
-            }
+                else {
+                	EliminarArchivo(nombreArchivo_);
+                }
+            } while(!nombreArchivo_.equals(COMANDO_TERMINACION));
         } catch (IOException e) {
         	System.out.println("Error en recibir datos");
+        	e.printStackTrace();
         }
     }
 
@@ -100,7 +100,7 @@ public class MainServidor {
 	 *
 	 */
 	public static void LeerDirectorio() {
-		File directorio = new File("/Users/ErickMV/Documents/pruebas");
+		File directorio = new File("C:/pedidos");
 		if (directorio.exists()) {
 			File[] archivos = directorio.listFiles();
 			pedidosMensajes = new ArrayList<>();
@@ -154,12 +154,9 @@ public class MainServidor {
 	 *
 	 * @param nombreArchivo
 	 */
-	private static void EliminarArchivo(String nombreArchivo) {
-		File archivo = new File("/Users/ErickMV/Documents/pruebas/"+nombreArchivo);
-		System.out.println("pathAbso: " + archivo.getAbsolutePath());
+	private static void EliminarArchivo(String nombreArchivo_) {
+		File archivo = new File("C:/pedidos/"+nombreArchivo_);
 		if(archivo.exists()) {
-			System.out.println("existe" );
-			System.out.println("archivo eliminado: " + nombreArchivo);
 			archivo.delete();
 		}
 	}
